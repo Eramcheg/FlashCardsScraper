@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>German Vocab Collector</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>German Vocab Collector</h1>
+      <p class="subtitle">Sign in, save words, and review them later on desktop.</p>
+    </header>
+
+    <section class="card" id="auth-card">
+      <h2>1. Sign in</h2>
+      <form id="login-form" class="stack">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" required />
+        <button type="submit">Send magic link</button>
+      </form>
+
+      <div id="user-panel" class="hidden stack">
+        <p>Signed in as <strong id="user-email"></strong></p>
+        <button id="sign-out-button" class="secondary" type="button">Sign out</button>
+      </div>
+
+      <p id="auth-message" class="message" aria-live="polite"></p>
+    </section>
+
+    <section class="card hidden" id="word-card">
+      <h2>2. Save a word</h2>
+      <form id="word-form" class="stack">
+        <label for="word">German word</label>
+        <input id="word" name="word" type="text" placeholder="z.B. Herausforderung" required />
+
+        <label for="translation">Translation</label>
+        <input id="translation" name="translation" type="text" placeholder="challenge" />
+
+        <label for="sentence">Example sentence</label>
+        <textarea id="sentence" name="sentence" rows="4" placeholder="Das war eine echte Herausforderung."></textarea>
+
+        <button type="submit">Save word</button>
+      </form>
+
+      <p id="save-message" class="message" aria-live="polite"></p>
+    </section>
+
+    <section class="card hidden" id="anki-card">
+      <h2>3. Anki</h2>
+
+      <div class="stack">
+        <button id="test-anki-button" type="button">Test Anki connection</button>
+
+        <label for="deck-select">Deck</label>
+        <select id="deck-select">
+          <option value="">Choose a deck</option>
+        </select>
+
+        <button id="load-decks-button" class="secondary" type="button">Load decks</button>
+        <button id="upload-anki-button" type="button">Upload saved words to Anki</button>
+      </div>
+
+      <p id="anki-message" class="message" aria-live="polite"></p>
+    </section>
+
+    <section class="card hidden" id="words-list-card">
+      <div class="row">
+        <h2>4. Your saved words</h2>
+        <button id="refresh-button" class="secondary" type="button">Refresh</button>
+      </div>
+      <div id="words-list" class="stack"></div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
