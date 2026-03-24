@@ -7,73 +7,109 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="container">
-    <header class="header">
-      <h1>German Vocab Collector</h1>
-      <p class="subtitle">Sign in, save words, and review them later on desktop.</p>
-    </header>
+<main class="container">
+  <header class="header">
+    <h1>German Vocab Collector</h1>
+    <p class="subtitle">Search a real entry, choose the right meaning, save it, and review later.</p>
+  </header>
 
-    <section class="card" id="auth-card">
-      <h2>1. Sign in</h2>
-      <form id="login-form" class="stack">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" placeholder="you@example.com" required />
-        <button type="submit">Send magic link</button>
-      </form>
+  <section class="card" id="auth-card">
+    <h2>1. Sign in</h2>
+    <form id="login-form" class="stack">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" required />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" placeholder="Password" required />
+      <button type="submit">Log in</button>
+    </form>
 
-      <div id="user-panel" class="hidden stack">
-        <p>Signed in as <strong id="user-email"></strong></p>
-        <button id="sign-out-button" class="secondary" type="button">Sign out</button>
+    <div id="user-panel" class="hidden stack">
+      <p>Signed in as <strong id="user-email"></strong></p>
+      <button id="sign-out-button" class="secondary" type="button">Sign out</button>
+    </div>
+
+    <p id="auth-message" class="message" aria-live="polite"></p>
+  </section>
+
+  <section class="card hidden" id="word-card">
+    <h2>2. Find a word</h2>
+    <div class="stack">
+      <label for="search-word">Search German word</label>
+      <input
+              id="search-word"
+              name="search-word"
+              type="text"
+              placeholder="z.B. machen"
+              autocomplete="off"
+              spellcheck="false"
+      />
+
+      <div id="search-results" class="search-results hidden"></div>
+      <p id="search-message" class="message" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="card hidden" id="words-list-card">
+    <div class="row row-wrap-mobile">
+      <h2>3. Your saved words</h2>
+      <button id="refresh-button" class="secondary" type="button">Refresh</button>
+    </div>
+    <div id="words-list" class="stack"></div>
+  </section>
+  <section class="card hidden" id="anki-card">
+    <h2>4. Anki</h2>
+
+    <div class="stack">
+      <button id="test-anki-button" type="button">Test Anki connection</button>
+
+      <label for="deck-select">Deck</label>
+      <select id="deck-select">
+        <option value="">Choose a deck</option>
+      </select>
+
+      <button id="load-decks-button" class="secondary" type="button">Load decks</button>
+      <button id="upload-anki-button" type="button">Upload saved words to Anki</button>
+    </div>
+
+    <p id="anki-message" class="message" aria-live="polite"></p>
+  </section>
+</main>
+
+<div id="word-sheet" class="sheet hidden" aria-hidden="true">
+  <div class="sheet-backdrop" id="sheet-backdrop"></div>
+
+  <section class="sheet-panel" aria-labelledby="sheet-word-title" aria-modal="true" role="dialog">
+    <div class="sheet-header">
+      <div>
+        <p class="sheet-kicker">Choose the right meaning</p>
+        <h3 id="sheet-word-title">Word</h3>
       </div>
+      <button id="close-sheet-button" class="secondary" type="button">Close</button>
+    </div>
 
-      <p id="auth-message" class="message" aria-live="polite"></p>
-    </section>
+    <div class="sheet-body stack">
+      <section class="stack tight-gap">
+        <div class="section-title-row">
+          <h4>Meanings</h4>
+          <p id="sheet-status" class="message compact-message"></p>
+        </div>
+        <div id="sense-list" class="choice-list"></div>
+      </section>
 
-    <section class="card hidden" id="word-card">
-      <h2>2. Save a word</h2>
-      <form id="word-form" class="stack">
-        <label for="word">German word</label>
-        <input id="word" name="word" type="text" placeholder="z.B. Herausforderung" required />
+      <section class="stack tight-gap">
+        <div class="section-title-row">
+          <h4>Example sentences</h4>
+          <p class="sheet-hint">Scroll and tap one sentence</p>
+        </div>
+        <div id="sentence-list" class="choice-list sentence-choice-list"></div>
+      </section>
 
-        <label for="translation">Translation</label>
-        <input id="translation" name="translation" type="text" placeholder="challenge" />
-
-        <label for="sentence">Example sentence</label>
-        <textarea id="sentence" name="sentence" rows="4" placeholder="Das war eine echte Herausforderung."></textarea>
-
-        <button type="submit">Save word</button>
-      </form>
-
+      <button id="save-selected-button" type="button">Save selected word</button>
       <p id="save-message" class="message" aria-live="polite"></p>
-    </section>
+    </div>
+  </section>
+</div>
 
-    <section class="card hidden" id="anki-card">
-      <h2>3. Anki</h2>
-
-      <div class="stack">
-        <button id="test-anki-button" type="button">Test Anki connection</button>
-
-        <label for="deck-select">Deck</label>
-        <select id="deck-select">
-          <option value="">Choose a deck</option>
-        </select>
-
-        <button id="load-decks-button" class="secondary" type="button">Load decks</button>
-        <button id="upload-anki-button" type="button">Upload saved words to Anki</button>
-      </div>
-
-      <p id="anki-message" class="message" aria-live="polite"></p>
-    </section>
-
-    <section class="card hidden" id="words-list-card">
-      <div class="row">
-        <h2>4. Your saved words</h2>
-        <button id="refresh-button" class="secondary" type="button">Refresh</button>
-      </div>
-      <div id="words-list" class="stack"></div>
-    </section>
-  </main>
-
-  <script type="module" src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
