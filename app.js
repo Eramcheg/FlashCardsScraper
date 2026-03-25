@@ -67,15 +67,39 @@ function escapeHtml(value) {
       .replaceAll("'", '&#039;');
 }
 function htmlToPlainText(input) {
-  const firstPass = new DOMParser()
-      .parseFromString(String(input ?? ''), 'text/html')
-      .body.textContent || '';
+  const doc = new DOMParser().parseFromString(String(input ?? ''), 'text/html');
+  const root = doc.body;
 
-  const secondPass = new DOMParser()
-      .parseFromString(firstPass, 'text/html')
-      .body.textContent || firstPass;
+  const selectorsToRemove = [
+    'style',
+    'script',
+    'noscript',
 
-  return secondPass.replace(/\s+/g, ' ').trim();
+    // common MediaWiki / Wiktionary junk
+    '[typeof*="mw:Extension/templatestyles"]',
+    '[typeof*="mw:Transclusion"]',
+
+    // specific classes from your example
+    '.usage-label-sense',
+    '.object-usage-tag',
+    '.annotation-paren',
+    '.ann-pos',
+
+    // often only side-notes / gloss notes
+    'small'
+  ];
+
+  root.querySelectorAll(selectorsToRemove.join(',')).forEach((el) => el.remove());
+
+  let text = root.textContent || '';
+
+  text = text
+      .replace(/\[[^\]]*\]/g, ' ')   // remove remaining [ ... ]
+      .replace(/\([^)]*\)/g, ' ')    // remove remaining ( ... ) if unwanted
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  return text;
 }
 function cleanDefinitionText(value) {
   return String(value ?? '')
@@ -348,6 +372,7 @@ async function fetchTatoebaSentences(word) {
   url.searchParams.set('q', word);
   url.searchParams.set('trans:lang', 'eng');
   url.searchParams.set('showtrans', 'matching');
+  url.searchParams.set('sort', 'relevance');
   url.searchParams.set('limit', '5');
 
   const response = await fetch(url);
@@ -398,7 +423,7 @@ function renderSentenceOptions(sentences) {
     selectedSentence = null;
     return;
   }
-
+  sentenceList.innerHTML = '';
   sentences.forEach((item, index) => {
     const card = document.createElement('button');
     card.type = 'button';
@@ -410,6 +435,8 @@ function renderSentenceOptions(sentences) {
     `;
 
     card.addEventListener('click', () => {
+      selectedSentence = item;
+      Array.from(sentenceList.children).forEach((element) => element.classList.remove('selected'));
       card.classList.add('selected');
     });
 
@@ -423,18 +450,12 @@ function renderSentenceOptions(sentences) {
 }
 
 function updateSentenceChoices() {
-  if (!selectedSense) {
-    renderSentenceOptions(fallbackSentences);
-    return;
-  }
+  const primaryExamples = Array.isArray(selectedSense?.examples)
+      ? selectedSense.examples
+      : [];
 
-  const primaryExamples = Array.isArray(selectedSense.examples) ? selectedSense.examples : [];
-  if (primaryExamples.length) {
-    renderSentenceOptions(primaryExamples);
-    return;
-  }
-
-  renderSentenceOptions(fallbackSentences);
+  const allExamples = [...primaryExamples, ...fallbackSentences];
+  renderSentenceOptions(allExamples);
 }
 
 function renderSenseOptions(senses) {
